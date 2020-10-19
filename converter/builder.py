@@ -16,7 +16,7 @@ class CsvBuilderAbstract:
 
     @staticmethod
     def _write_csv(filename, fieldnames, items):
-        with open(filename, mode='w', encoding='UTF-8') as csv_file:
+        with open(filename, mode='w', encoding='UTF-8', newline='') as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames, quoting=csv.QUOTE_NONNUMERIC)
             writer.writeheader()
             for item in items:
