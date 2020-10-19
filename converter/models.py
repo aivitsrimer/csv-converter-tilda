@@ -74,10 +74,22 @@ class TildaItem:
     COLUMN_UID = "Tilda UID"
     COLUMN_SKU = "SKU"
     COLUMN_CATEGORY = "Category"
+    COLUMN_BRAND = "Brand"
     COLUMN_TITLE = "Title"
     COLUMN_PRICE = "Price"
     COLUMN_QUANTITY = "Quantity"
-    VALIDATE_COLUMNS = [COLUMN_UID, COLUMN_SKU, COLUMN_CATEGORY, COLUMN_TITLE, COLUMN_PRICE, COLUMN_QUANTITY]
+    COLUMN_DESCRIPTION = "Description"
+    COLUMN_TEXT = "Text"
+    COLUMN_PHOTO = "Photo"
+
+    VALIDATE_COLUMNS = [
+        COLUMN_UID,
+        COLUMN_SKU,
+        COLUMN_CATEGORY,
+        COLUMN_TITLE,
+        COLUMN_PRICE,
+        COLUMN_QUANTITY,
+    ]
 
     @staticmethod
     def validate_row(row: dict) -> Union[str, bool]:
@@ -96,27 +108,47 @@ class TildaItem:
 class WooItem:
     sku: str
     title: str
+    shortDescription: str
     description: str
     quantity: str
     price: str
-    category: str
     image: str
 
     COLUMN_SKU = "Артикул"
     COLUMN_TITLE = "Имя"
+    COLUMN_SHORT_DESC = "Короткое описание"
     COLUMN_DESCRIPTION = "Описание"
     COLUMN_QUANTITY = "Запасы"
     COLUMN_PRICE = "Базовая цена"
-    COLUMN_CATEGORY = "Категории"
     COLUMN_IMAGE = "Изображения"
-    VALIDATE_COLUMNS = [COLUMN_SKU, COLUMN_TITLE, COLUMN_DESCRIPTION, COLUMN_QUANTITY, COLUMN_PRICE, COLUMN_CATEGORY,
-                        COLUMN_IMAGE]
+
+    VALIDATE_COLUMNS = [
+        COLUMN_SKU,
+        COLUMN_TITLE,
+        COLUMN_SHORT_DESC,
+        COLUMN_DESCRIPTION,
+        COLUMN_QUANTITY,
+        COLUMN_PRICE,
+        COLUMN_IMAGE,
+    ]
 
     @staticmethod
     def validate_row(row: dict) -> Union[str, bool]:
+        errors = []
         for key in WooItem.VALIDATE_COLUMNS:
             if not (key in row.keys()):
-                return 'Отсутствуют нужные поля'
+                errors.append('Отсутствуют нужные поля')
+
+        if row[WooItem.COLUMN_SKU] == '':
+            errors.append('Пустой артикул')
+        else:
+            if search(r'[^a-zA-Z-0-9]', row[WooItem.COLUMN_SKU]):
+                errors.append('Некорректный артикул (должен содержать только англ. буквы, цифры и тире)')
+            else:
+                prefix = findall(r'^([A-Z]{2,})-', row[WooItem.COLUMN_SKU])
+                if len(prefix) == 0:
+                    errors.append('Некорректный артикул (отсутствует префикс бренда)')
+
         return True
 
     @staticmethod

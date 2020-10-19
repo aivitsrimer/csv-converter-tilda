@@ -14,11 +14,11 @@ def main(woo_filepath: str, out_dir: str):
 
     woo_csv = WooParser(woo_filepath)
     print('Woo csv parsed, len:', len(woo_csv.index_by_sku))
-    item: WooItem
-    for item in woo_csv.items:
-        item.description = re.sub(r'(<[^>]*?>)|(\\n)', '', item.description)
-        item.description = re.sub(r'\n\n', '\n', item.description)
-    print(1)
+
+    convert(woo_csv)
+
+    InsertCsvBuilder.build_and_write(woo_csv.items, out_dir)
+    print('csv for insert created')
 
     # new_items, update_items = compare(tilda_csv, mps_csv)
     #
@@ -59,6 +59,16 @@ def compare(tilda_csv: TildaParser, mps_csv: MpsParser) -> tuple:
         else:
             new_items.append(mps_item)
     return new_items, update_items
+
+
+def convert(woo_csv: WooParser):
+    item: WooItem
+    for item in woo_csv.items:
+        item.price = re.sub(r',', '.', item.price)
+        item.description = re.sub(r'(((?!</?strong>))(<[^>]*?>))|(\\n)', '', item.description)
+        item.description = re.sub(r'\n\n', '\n', item.description)
+        item.description = item.description.strip('\n')
+        item.image = item.image.split(', ')[0]
 
 
 def init():

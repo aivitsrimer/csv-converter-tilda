@@ -1,5 +1,5 @@
 import csv
-from converter import MpsItem, TildaItem
+from converter import MpsItem, TildaItem, WooItem
 
 COLUMN_UID = "Tilda UID"
 COLUMN_SKU = "SKU"
@@ -25,26 +25,35 @@ class CsvBuilderAbstract:
 
 class InsertCsvBuilder(CsvBuilderAbstract):
     DEFAULT_CATEGORY = 'import'
+    DEFAULT_BRAND = 'Tegor'
 
     @staticmethod
     def build_and_write(items, out_dir):
-        # type: (list[MpsItem], str) -> None
+        # type: (list[WooItem], str) -> None
         result = []
         for item in items:
             result.append({
                 TildaItem.COLUMN_SKU: item.sku,
+                TildaItem.COLUMN_BRAND: InsertCsvBuilder.DEFAULT_BRAND,
                 TildaItem.COLUMN_CATEGORY: InsertCsvBuilder.DEFAULT_CATEGORY,
                 TildaItem.COLUMN_TITLE: item.title,
                 TildaItem.COLUMN_PRICE: float(item.price),
                 TildaItem.COLUMN_QUANTITY: int(float(item.quantity)),
+                TildaItem.COLUMN_DESCRIPTION: item.description,
+                TildaItem.COLUMN_TEXT: item.description,
+                TildaItem.COLUMN_PHOTO: item.image,
             })
 
         fieldnames = [
             TildaItem.COLUMN_SKU,
             TildaItem.COLUMN_CATEGORY,
+            TildaItem.COLUMN_BRAND,
             TildaItem.COLUMN_TITLE,
             TildaItem.COLUMN_PRICE,
             TildaItem.COLUMN_QUANTITY,
+            TildaItem.COLUMN_PHOTO,
+            TildaItem.COLUMN_DESCRIPTION,
+            TildaItem.COLUMN_TEXT,
         ]
         InsertCsvBuilder._write_csv(out_dir.rstrip('/') + '/insert.csv', fieldnames, result)
 
