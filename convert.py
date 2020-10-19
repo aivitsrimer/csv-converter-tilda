@@ -65,9 +65,12 @@ def convert(woo_csv: WooParser):
     item: WooItem
     for item in woo_csv.items:
         item.price = re.sub(r',', '.', item.price)
+        item.description = re.sub(r'<b>', '<strong>', item.description)
+        item.description = re.sub(r'</b>', '</strong>', item.description)
         item.description = re.sub(r'(((?!</?strong>))(<[^>]*?>))|(\\n)', '', item.description)
         item.description = re.sub(r'\n\n', '\n', item.description)
         item.description = item.description.strip('\n')
+        item.description = re.sub(r'\n', '<br />', item.description)
         item.image = item.image.split(', ')[0]
 
 
